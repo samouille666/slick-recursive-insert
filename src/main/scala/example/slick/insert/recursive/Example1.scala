@@ -1,5 +1,6 @@
 package example.slick.insert.recursive
 
+import example.slick.insert.recursive.Example1.Clause
 import org.slf4j.LoggerFactory
 
 object Example1 {
@@ -83,7 +84,7 @@ object Example1 {
       val _2ins = cs.head
 
       _2ins.operator match {
-        case "NEQ" | "EQ" | "LT" | "GT" => {
+        case "NEQ" | "EQ" | "LT" | "GT" | "LTE" | "GTE" => {
           acc match {
             case Nil => insertClause(_2ins, None)
             case _ => {
@@ -166,6 +167,22 @@ object Example1 {
     Clause("NEQ", Some("fields4"), Some("val4"), None)
   )
 
+  val clause13 = Seq(
+    Clause("AND", None, None, None),
+    Clause("AND", None, None, None),
+    Clause("OR", None, None, None),
+    Clause("EQ", Some("fields1"), Some("val1"), None),
+    Clause("LT", Some("fields2"), Some("val2"), None),
+    Clause("AND", None, None, None),
+    Clause("OR", None, None, None),
+    Clause("LTE", Some("fields3"), Some("val3"), None),
+    Clause("GT", Some("fields4"), Some("val4"), None),
+    Clause("NEQ", Some("fields5"), Some("val5"), None),
+    Clause("OR", None, None, None),
+    Clause("GTE", Some("fields6"), Some("val6"), None),
+    Clause("EQ", Some("fields7"), Some("val7"), None),
+  )
+
   import scala.concurrent.Await
   import scala.concurrent.duration._
 
@@ -177,7 +194,8 @@ object Example1 {
     //    inserterGeneric(clause1, "1 part clause")
     //    inserterGeneric(clause3, "3 part clause")
     //    inserterGeneric(clause5, "5 part clause")
-    inserterGeneric(clause7, "7 part clause")
+    //    inserterGeneric(clause7, "7 part clause")
+    inserterGeneric(clause13, "13 part clause")
   }
 
   def inserterGeneric(cs: Seq[Clause], msg: String): Unit = {
