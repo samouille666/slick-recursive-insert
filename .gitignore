@@ -1,0 +1,19 @@
+# Created by .ignore support plugin (hsz.mobi)
+/.idea
+target
+ideatarget
+.target
+bin
+.cache
+.cache-main
+.cache-tests
+.classpath
+.project
+.tmpBin
+.factorypath
+.settings
+logs
+*.log
+*.sc
+.idea/
+target/
