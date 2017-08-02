@@ -88,19 +88,12 @@ object Example1 {
           acc match {
             case Nil => insertClause(_2ins, None)
             case _ => {
+              val insAct = insertClause(_2ins, Some(acc.head._1))
               acc.head match {
-                case (_, None, None) => {
-                  debug(acc)
-                  insertClause(_2ins, Some(acc.head._1)) flatMap
-                    (rec => loop((acc.head._1, Some(rec), None) :: acc.tail, cs.tail))
-                }
-
-                case (_, Some(_), None) => {
-                  debug(acc)
-                  if (cs.tail.isEmpty) insertClause(_2ins, Some(acc.head._1))
-                  else insertClause(_2ins, Some(acc.head._1)) >> loop(acc.tail, cs.tail)
-                }
-
+                case (_, None, None) =>
+                  insAct flatMap (rec => loop((acc.head._1, Some(rec), None) :: acc.tail, cs.tail))
+                case (_, Some(_), None) =>
+                  if (cs.tail.isEmpty) insAct else insAct >> loop(acc.tail, cs.tail)
                 case _ => throw new RuntimeException(s"Impossible case !")
               }
             }
@@ -109,24 +102,19 @@ object Example1 {
         case "AND" | "OR" => {
           acc match {
             case Nil => {
-              debug(acc)
-              if (cs.tail.isEmpty) insertClause(_2ins, None)
-              else insertClause(_2ins, None) flatMap (rec => loop((rec, None, None) :: acc, cs.tail))
+              val insAct = insertClause(_2ins, None)
+              if (cs.tail.isEmpty) throw new RuntimeException("Impossible state !!!")
+              else insAct flatMap (rec => loop((rec, None, None) :: acc, cs.tail))
             }
 
             case _ => {
               val h = acc.head
+              val insAct = insertClause(_2ins, Some(h._1))
               h match {
-                case (_, None, None) => {
-                  debug(acc)
-                  insertClause(_2ins, Some(h._1)).flatMap {
-                    r => loop((r, None, None) :: (h._1, Some(r), None) :: acc.tail, cs.tail)
-                  }
-                }
-                case (_, Some(_), None) => {
-                  debug(acc)
-                  insertClause(_2ins, Some(h._1)) flatMap (r => loop((r, None, None) :: acc.tail, cs.tail))
-                }
+                case (_, None, None) =>
+                  insAct flatMap (r => loop((r, None, None) :: (h._1, Some(r), None) :: acc.tail, cs.tail))
+                case (_, Some(_), None) =>
+                  insAct flatMap (r => loop((r, None, None) :: acc.tail, cs.tail))
                 case _ => throw new RuntimeException(s"Impossible case !")
               }
             }
